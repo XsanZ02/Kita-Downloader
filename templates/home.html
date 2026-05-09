@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Pusat unduhan Kita.in. Download video dan audio berkualitas tinggi dari YouTube, TikTok, Instagram, Facebook, dan MP3 tanpa batas, 100% aman dan gratis.">
+<meta name="keywords" content="youtube downloader, tiktok downloader tanpa watermark, instagram downloader, facebook video downloader, mp3 converter, download video gratis">
+<meta name="author" content="Kita.in">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Kita.in - All-in-One Media Downloader">
+<meta property="og:description" content="Download video dan audio dari platform sosial media populer dengan cepat dan gratis.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<!-- Favicon Otomatis (Format SVG) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23c8f135'/%3E%3Ctext x='12' y='68' font-family='sans-serif' font-weight='900' font-size='42' fill='%230a0a0f' letter-spacing='-2'%3EKd%3C/text%3E%3Cpath d='M78 35 v30 M66 53 l12 12 l12 -12' stroke='%230a0a0f' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+<title>Kita.in - Dashboard Downloader</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>
+  // Cegah FOUC & ikuti preferensi sistem operasi otomatis
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+    document.documentElement.classList.add('light-mode');
+  }
+</script>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.15);
+    --text: #f0eeff;
+    --muted: #8b8b9e;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --overlay: rgba(255,255,255,0.05);
+    --glow: rgba(255,255,255,0.06);
+  }
+  :root.light-mode {
+    --bg: #f4f4f8;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.1);
+    --border-hover: rgba(0,0,0,0.2);
+    --text: #12121a;
+    --muted: #666677;
+    --overlay: rgba(0,0,0,0.05);
+    --glow: rgba(0,0,0,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+  /* Glowing background */
+  body::before {
+    content: ''; position: fixed; top: -20%; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(79,110,247,0.1) 0%, rgba(232,67,147,0.05) 40%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .container {
+    width: 100%; max-width: 1000px; padding: 60px 24px; position: relative; z-index: 1;
+  }
+  header { text-align: center; margin-bottom: 60px; animation: fadeDown 0.6s ease both; }
+  .badge {
+    display: inline-block; background: var(--overlay); border: 1px solid var(--border);
+    padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; margin-bottom: 20px;
+    color: #c8f135; letter-spacing: 1px; text-transform: uppercase;
+  }
+  h1 { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
+  h1 span { background: linear-gradient(135deg, #c8f135, #35f1c8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { color: var(--muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+  
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; animation: fadeUp 0.6s ease 0.2s both;
+  }
+  
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    padding: 32px 24px; text-decoration: none; color: var(--text); transition: all 0.3s ease;
+    display: flex; flex-direction: column; position: relative; overflow: hidden;
+  }
+  /* Efek cahaya mouse hover */
+  .card::before {
+    content: ''; position: absolute; inset: 0; background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), var(--glow), transparent 40%); opacity: 0; transition: opacity 0.3s;
+  }
+  .card:hover::before { opacity: 1; }
+  .card:hover { transform: translateY(-5px); border-color: var(--border-hover); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  
+  .icon-wrap {
+    width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: 20px;
+  }
+  /* Warna Ikon Masing-masing Platform */
+  .card.yt .icon-wrap { background: rgba(255,0,0,0.1); color: #ff0000; border: 1px solid rgba(255,0,0,0.2); }
+  .card.tt .icon-wrap { background: rgba(37,244,238,0.1); color: #25f4ee; border: 1px solid rgba(37,244,238,0.2); }
+  .card.ig .icon-wrap { background: rgba(232,67,147,0.1); color: #e84393; border: 1px solid rgba(232,67,147,0.2); }
+  .card.fb .icon-wrap { background: rgba(24,119,242,0.1); color: #1877f2; border: 1px solid rgba(24,119,242,0.2); }
+  .card.mp3 .icon-wrap { background: rgba(200,241,53,0.1); color: #c8f135; border: 1px solid rgba(200,241,53,0.2); }
+  
+  .card-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; margin-bottom: 10px; }
+  .card-desc { color: var(--muted); font-size: 0.95rem; line-height: 1.5; flex: 1; }
+  
+  .card-arrow {
+    margin-top: 24px; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text);
+  }
+  .card-arrow svg { transition: transform 0.2s; }
+  .card:hover .card-arrow svg { transform: translateX(5px); }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Features & Footer */
+  .features-section { margin-top: 80px; text-align: center; animation: fadeUp 0.6s ease 0.4s both; }
+  .features-section h2 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 40px; }
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; text-align: left; }
+  .feature-box { background: var(--overlay); border: 1px solid var(--border); padding: 30px; border-radius: 16px; transition: transform 0.3s; }
+  .feature-box:hover { transform: translateY(-5px); border-color: var(--border-hover); background: var(--border); }
+  .feature-box h3 { color: var(--text); margin-bottom: 15px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+  .feature-box p { color: var(--muted); line-height: 1.6; font-size: 0.95rem; }
+  
+  footer { margin-top: 80px; padding: 30px 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; text-align: center; width: 100%; animation: fadeUp 0.6s ease 0.6s both; line-height: 1.8; }
+  footer a { color: var(--text); text-decoration: none; margin: 0 10px; font-weight: 500; transition: color 0.2s; }
+  footer a:hover { color: var(--accent); }
+
+  /* Ads & Donation */
+  .ad-banner {
+    width: 100%; max-width: 728px; min-height: 90px; margin: 30px auto;
+    background: var(--overlay); border: 1px dashed var(--border); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.9rem;
+  }
+  .btn-donate {
+    display: inline-flex; align-items: center; gap: 8px; background: #ff4757; color: #fff !important;
+    padding: 8px 16px; border-radius: 8px; font-weight: 600; margin-top: 15px; transition: 0.2s; border: none;
+  }
+  .btn-donate:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,71,87,0.3); }
+</style>
+</head>
+<body>
+  <!-- Tombol Tema Global -->
+  <div style="position: absolute; top: 20px; right: 24px; z-index: 100;">
+    <button id="themeToggle" title="Ganti Tema" style="background: transparent; border: 1px solid var(--border); border-radius: 50%; width: 40px; height: 40px; cursor: pointer; color: var(--text);">🌙</button>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="badge">All-in-One Tools</div>
+      <h1>Pusat Unduhan<br><span>Kita.in</span></h1>
+      <p class="subtitle">Pilih platform yang ingin kamu tuju. Download video dan audio berkualitas tinggi tanpa batas dari mana saja.</p>
+    </header>
+
+    <!-- Tempat Iklan Atas -->
+    <div class="ad-banner">
+      <!-- PASTE SCRIPT IKLAN BANNER ADSTERRA (Misal: 728x90) DI SINI -->
+      Slot Iklan Adsterra Atas
+    </div>
+
+    <div class="grid" id="cards">
+      <!-- YouTube -->
+      <a href="/yt" class="card yt">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M21.582 6.186a2.506 2.506 0 0 0-1.762-1.766C18.265 4 12 4 12 4s-6.264 0-7.82.42a2.505 2.505 0 0 0-1.762 1.766C2 7.74 2 12 2 12s0 4.26.418 5.814a2.506 2.506 0 0 0 1.762 1.766C5.735 20 12 20 12 20s6.265 0 7.82-.42a2.506 2.506 0 0 0 1.762-1.766C22 16.26 22 12 22 12s0-4.26-.418-5.814zM9.75 15.02v-6.04L15.5 12l-5.75 3.02z"/></svg>
+        </div>
+        <h2 class="card-title">YouTube</h2>
+        <p class="card-desc">Download video YouTube hingga 4K atau ekstrak audio MP3 dengan cepat.</p>
+        <div class="card-arrow">Buka Tool <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </a>
+
+      <!-- TikTok -->
+      <a href="/tiktok" class="card tt">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.26 8.26 0 004.84 1.56V6.82a4.85 4.85 0 01-1.07-.13z"/></svg>
+        </div>
+        <h2 class="card-title">TikTok</h2>
+        <p class="card-desc">Simpan video TikTok favoritmu ke perangkat tanpa watermark (tanda air).</p>
+        <div class="card-arrow">Buka Tool <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </a>
+
+      <!-- Instagram -->
+      <a href="/ig" class="card ig">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <h2 class="card-title">Instagram</h2>
+        <p class="card-desc">Download Reels, IGTV, dan Postingan Instagram dengan kualitas HD.</p>
+        <div class="card-arrow">Buka Tool <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </a>
+
+      <!-- Facebook -->
+      <a href="/fb" class="card fb">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </div>
+        <h2 class="card-title">Facebook</h2>
+        <p class="card-desc">Unduh video publik dari Facebook untuk ditonton secara offline kapan saja.</p>
+        <div class="card-arrow">Buka Tool <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </a>
+
+      <!-- Universal MP3 -->
+      <a href="/mp3" class="card mp3">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
+        <h2 class="card-title">SoundRip MP3</h2>
+        <p class="card-desc">Konversi audio dari 1000+ platform media sosial dengan bitrate tinggi (320kbps).</p>
+        <div class="card-arrow">Buka Tool <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </a>
+    </div>
+
+    <!-- Bagian Penjelasan Fitur Utama -->
+    <div class="features-section">
+      <h2>Kenapa Memilih Kita.in?</h2>
+      <div class="features-grid">
+        <div class="feature-box">
+          <h3>🚀 Super Cepat</h3>
+          <p>Kami menggunakan server dengan bandwidth tinggi untuk memastikan proses ekstraksi, konversi, dan unduhan file Anda berjalan dalam hitungan detik tanpa hambatan.</p>
+        </div>
+        <div class="feature-box">
+          <h3>🛡️ 100% Aman & Gratis</h3>
+          <p>Tidak perlu menginstal aplikasi tambahan atau mendaftar akun. Layanan kami sepenuhnya gratis, tanpa batasan, dan aman dari ancaman virus maupun malware.</p>
+        </div>
+        <div class="feature-box">
+          <h3>📱 Multi-Perangkat</h3>
+          <p>Akses alat unduh kami dari perangkat apa saja. Mulai dari PC, Laptop, Tablet, hingga Smartphone (Android & iOS), semuanya didukung dengan tampilan antar muka yang mulus.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tempat Iklan Bawah -->
+    <div class="ad-banner">
+      <!-- PASTE SCRIPT IKLAN NATIVE BANNER / 300x250 ADSTERRA DI SINI -->
+      Slot Iklan Adsterra Bawah
+    </div>
+
+  </div>
+
+  <footer>
+    &copy; 2024 Kita.in - Semua Hak Cipta Dilindungi.<br>
+    Layanan web unduhan video dan audio gratis untuk kebutuhan digital Anda.<br>
+    <div style="margin-top: 10px;">
+      <a href="/tos">Terms of Service</a> | <a href="/privacy">Privacy Policy</a>
+    </div>
+    <a href="https://trakteer.id/iam_tomz" target="_blank" class="btn-donate">☕ Dukung Developer</a>
+  </footer>
+
+  <script>
+    // Mengkalkulasikan posisi kursor agar efek radial gradient mengikuti mouse di dalam cards
+    document.getElementById("cards").onmousemove = e => {
+      for(const card of document.getElementsByClassName("card")) {
+        const rect = card.getBoundingClientRect(),
+              x = e.clientX - rect.left,
+              y = e.clientY - rect.top;
+        card.style.setProperty("--mouse-x", `${x}px`);
+        card.style.setProperty("--mouse-y", `${y}px`);
+      };
+    }
+
+    // Logika Sinkronisasi Tema
+    const themeBtn = document.getElementById('themeToggle');
+    if (document.documentElement.classList.contains('light-mode')) themeBtn.textContent = '☀️';
+    themeBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('light-mode');
+      const isLightMode = document.documentElement.classList.contains('light-mode');
+      themeBtn.textContent = isLightMode ? '☀️' : '🌙';
+      localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+    });
+
+    // Deteksi perubahan tema sistem secara real-time
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
+      if (!localStorage.getItem('theme')) {
+        document.documentElement.classList.toggle('light-mode', e.matches);
+        themeBtn.textContent = e.matches ? '☀️' : '🌙';
+      }
+    });
+  </script>
+
+  <!-- Script Popunder / Social Bar Adsterra -->
+  <script type="text/javascript" src="https://www.profitablecpmratenetwork.com/umtcqfn3?key=c669d884aa749733fddcde4849b3f4ac"></script>
+</body>
+</html>

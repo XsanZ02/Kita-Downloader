@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }} - Kita.in</title>
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23c8f135'/%3E%3Ctext x='12' y='68' font-family='sans-serif' font-weight='900' font-size='42' fill='%230a0a0f' letter-spacing='-2'%3EKd%3C/text%3E%3Cpath d='M78 35 v30 M66 53 l12 12 l12 -12' stroke='%230a0a0f' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+      document.documentElement.classList.add('light-mode');
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: rgba(255,255,255,0.07);
+      --text: #f0eeff;
+      --muted: #8b8b9e;
+      --accent: #c8f135;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --overlay: rgba(255,255,255,0.05);
+    }
+    :root.light-mode {
+      --bg: #f4f4f8;
+      --surface: #ffffff;
+      --border: rgba(0,0,0,0.1);
+      --text: #12121a;
+      --muted: #666677;
+      --overlay: rgba(0,0,0,0.05);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text); font-family: var(--font-body);
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    }
+    .navbar {
+      width: 100%; max-width: 800px; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .navbar a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 1.1rem; }
+    #themeToggle {
+      background: transparent; border: 1px solid var(--border); border-radius: 50%; width: 40px; height: 40px; cursor: pointer; color: var(--text);
+    }
+    .container {
+      width: 100%; max-width: 800px; padding: 40px 24px; flex: 1;
+    }
+    header { margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+    h1 { font-family: var(--font-display); font-size: 2.5rem; color: var(--accent); margin-bottom: 10px; }
+    .date { color: var(--muted); font-size: 0.95rem; }
+    
+    .content-section { margin-bottom: 30px; }
+    .content-section h2 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 12px; color: var(--text); }
+    .content-section p { color: var(--muted); line-height: 1.7; font-size: 1rem; }
+
+    footer { margin-top: 40px; padding: 30px 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; text-align: center; width: 100%; }
+    footer a { color: var(--text); text-decoration: none; margin: 0 10px; font-weight: 500; }
+    footer a:hover { color: var(--accent); }
+
+    .btn-donate {
+      display: inline-flex; align-items: center; gap: 8px; background: #ff4757; color: #fff !important;
+      padding: 8px 16px; border-radius: 8px; font-weight: 600; margin-top: 15px; transition: 0.2s; border: none;
+    }
+    .btn-donate:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,71,87,0.3); }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <a href="/">&larr; Kembali ke Beranda</a>
+    <button id="themeToggle" title="Ganti Tema">🌙</button>
+  </div>
+
+  <div class="container">
+    <header>
+      <h1>{{ title }}</h1>
+      <div class="date">Pembaruan Terakhir: {{ last_updated }}</div>
+    </header>
+
+    <!-- Rendering Konten secara Dinamis -->
+    {% for section in content %}
+    <div class="content-section">
+      <h2>{{ section.heading }}</h2>
+      <p>{{ section.text }}</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <footer>
+    &copy; 2024 Kita.in - Semua Hak Cipta Dilindungi.<br>
+    <div style="margin-top: 10px;">
+      <a href="/tos">Terms of Service</a> | <a href="/privacy">Privacy Policy</a>
+    </div>
+    <a href="https://trakteer.id/iam_tomz" target="_blank" class="btn-donate">☕ Dukung Developer</a>
+  </footer>
+
+  <script>
+    // Logika Sinkronisasi Tema
+    const themeBtn = document.getElementById('themeToggle');
+    if (document.documentElement.classList.contains('light-mode')) themeBtn.textContent = '☀️';
+    
+    themeBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('light-mode');
+      const isLightMode = document.documentElement.classList.contains('light-mode');
+      themeBtn.textContent = isLightMode ? '☀️' : '🌙';
+      localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+    });
+
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
+      if (!localStorage.getItem('theme')) {
+        document.documentElement.classList.toggle('light-mode', e.matches);
+        themeBtn.textContent = e.matches ? '☀️' : '🌙';
+      }
+    });
+  </script>
+</body>
+</html>

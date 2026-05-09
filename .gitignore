@@ -1,0 +1,14 @@
+# Python environment & cache
+__pycache__/
+*.py[cod]
+venv/
+env/
+.env
+
+# Folder penyimpanan sementara (Downloads)
+youtube_downloads/
+platform_downloads/
+
+# File sistem bawaan OS
+.DS_Store
+Thumbs.db
