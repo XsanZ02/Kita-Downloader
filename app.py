@@ -8,6 +8,7 @@ from flask_wtf.csrf import CSRFProtect
 from routes.yt_routes import yt_bp
 from routes.main_routes import main_bp
 from routes.platform_api_routes import platform_api_bp
+from flask_mail import Mail
 
 # Muat variabel lingkungan dari file .env
 load_dotenv()
@@ -26,6 +27,16 @@ limiter = Limiter(
     default_limits=["200 per day", "20 per minute"],
     storage_uri="memory://"
 )
+
+# 0.2 Konfigurasi Flask-Mail (Gmail SMTP)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'kitajokiin03@gmail.com')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', '')  # Diisi dengan App Password Gmail di .env
+
+mail = Mail(app)
+app.mail = mail  # Menyimpan instance agar bisa dipanggil di blueprint
 
 # 0.5 Keamanan CORS & Pencegahan Hotlinking
 @app.before_request

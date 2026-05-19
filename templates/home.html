@@ -11,8 +11,8 @@
 <meta property="og:description" content="Download video dan audio dari platform sosial media populer dengan cepat dan gratis.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<!-- Favicon Otomatis (Format SVG) -->
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23c8f135'/%3E%3Ctext x='12' y='68' font-family='sans-serif' font-weight='900' font-size='42' fill='%230a0a0f' letter-spacing='-2'%3EKd%3C/text%3E%3Cpath d='M78 35 v30 M66 53 l12 12 l12 -12' stroke='%230a0a0f' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+<!-- Favicon Kustom -->
+<link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
 <title>Kita.in - Dashboard Downloader</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script>
@@ -34,6 +34,8 @@
     --font-body: 'DM Sans', sans-serif;
     --overlay: rgba(255,255,255,0.05);
     --glow: rgba(255,255,255,0.06);
+    --accent-text: #c8f135;
+    --gradient-text: linear-gradient(135deg, #c8f135, #35f1c8);
   }
   :root.light-mode {
     --bg: #f4f4f8;
@@ -44,6 +46,8 @@
     --muted: #666677;
     --overlay: rgba(0,0,0,0.05);
     --glow: rgba(0,0,0,0.06);
+    --accent-text: #4a6b00;
+    --gradient-text: linear-gradient(135deg, #4a6b00, #007a5a);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -63,6 +67,15 @@
     background: radial-gradient(circle, rgba(79,110,247,0.1) 0%, rgba(232,67,147,0.05) 40%, transparent 70%);
     pointer-events: none; z-index: 0;
   }
+  /* Animated Grid Background */
+  .bg-grid { 
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+    opacity: 0.4;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 10%, transparent 80%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 10%, transparent 80%);
+  }
   .container {
     width: 100%; max-width: 1000px; padding: 60px 24px; position: relative; z-index: 1;
   }
@@ -70,11 +83,25 @@
   .badge {
     display: inline-block; background: var(--overlay); border: 1px solid var(--border);
     padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; margin-bottom: 20px;
-    color: #c8f135; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--accent-text); letter-spacing: 1px; text-transform: uppercase;
   }
-  h1 { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
-  h1 span { background: linear-gradient(135deg, #c8f135, #35f1c8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  
+  /* Header Title & Logo Styling */
+  .header-title-wrap { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 16px; }
+  .header-logo { width: clamp(60px, 8vw, 80px); height: clamp(60px, 8vw, 80px); object-fit: cover; border-radius: 50%; flex-shrink: 0; animation: floatLogo 4s ease-in-out infinite; filter: drop-shadow(0 10px 20px rgba(200,241,53,0.2)); }
+  @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  
+  h1 { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 0; text-align: left; }
+  h1 span { background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  
+  @media(max-width: 500px) { .header-title-wrap { flex-direction: column; text-align: center; gap: 12px; } h1 { text-align: center; } }
+
   .subtitle { color: var(--muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+  
+  /* Hero Stats */
+  .hero-stats { display: flex; justify-content: center; gap: 15px; margin-top: 25px; flex-wrap: wrap; animation: fadeUp 0.6s ease 0.1s both; }
+  .stat-badge { background: var(--surface); border: 1px solid var(--border); padding: 8px 16px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  .stat-badge span { color: var(--accent-text); }
   
   .grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; animation: fadeUp 0.6s ease 0.2s both;
@@ -91,17 +118,23 @@
   }
   .card:hover::before { opacity: 1; }
   .card:hover { transform: translateY(-5px); border-color: var(--border-hover); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .card:active { transform: translateY(-2px) scale(0.98); }
   
   .icon-wrap {
     width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
-    font-size: 24px; margin-bottom: 20px;
+    font-size: 24px; margin-bottom: 20px; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
+  .card:hover .icon-wrap { transform: scale(1.1) rotate(5deg); }
   /* Warna Ikon Masing-masing Platform */
   .card.yt .icon-wrap { background: rgba(255,0,0,0.1); color: #ff0000; border: 1px solid rgba(255,0,0,0.2); }
   .card.tt .icon-wrap { background: rgba(37,244,238,0.1); color: #25f4ee; border: 1px solid rgba(37,244,238,0.2); }
   .card.ig .icon-wrap { background: rgba(232,67,147,0.1); color: #e84393; border: 1px solid rgba(232,67,147,0.2); }
   .card.fb .icon-wrap { background: rgba(24,119,242,0.1); color: #1877f2; border: 1px solid rgba(24,119,242,0.2); }
-  .card.mp3 .icon-wrap { background: rgba(200,241,53,0.1); color: #c8f135; border: 1px solid rgba(200,241,53,0.2); }
+  .card.tw .icon-wrap { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); }
+  .card.th .icon-wrap { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); }
+  .card.xhs .icon-wrap { background: rgba(255,36,66,0.1); color: #ff2442; border: 1px solid rgba(255,36,66,0.2); }
+  .card.img .icon-wrap { background: rgba(255,152,0,0.1); color: #ff9800; border: 1px solid rgba(255,152,0,0.2); }
+  .card.mp3 .icon-wrap { background: rgba(200,241,53,0.1); color: var(--accent-text); border: 1px solid rgba(200,241,53,0.2); }
   
   .card-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; margin-bottom: 10px; }
   .card-desc { color: var(--muted); font-size: 0.95rem; line-height: 1.5; flex: 1; }
@@ -126,19 +159,46 @@
   
   footer { margin-top: 80px; padding: 30px 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; text-align: center; width: 100%; animation: fadeUp 0.6s ease 0.6s both; line-height: 1.8; }
   footer a { color: var(--text); text-decoration: none; margin: 0 10px; font-weight: 500; transition: color 0.2s; }
-  footer a:hover { color: var(--accent); }
+  footer a:hover { color: var(--accent-text); }
 
   /* Ads & Donation */
   .ad-banner {
     width: 100%; max-width: 728px; min-height: 90px; margin: 30px auto;
     background: var(--overlay); border: 1px dashed var(--border); border-radius: 12px;
     display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.9rem;
+    position: relative; overflow: hidden;
   }
+  .ad-banner::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 2s infinite; }
+  .light-mode .ad-banner::before { background: linear-gradient(90deg, transparent, rgba(0,0,0,0.03), transparent); }
+  @keyframes shimmer { 100% { left: 100%; } }
+
   .btn-donate {
-    display: inline-flex; align-items: center; gap: 8px; background: #ff4757; color: #fff !important;
-    padding: 8px 16px; border-radius: 8px; font-weight: 600; margin-top: 15px; transition: 0.2s; border: none;
+    position: relative; display: inline-flex; align-items: center; gap: 8px; background: #ff4757; color: #fff !important;
+    padding: 10px 20px; border-radius: 12px; font-weight: 700; margin-top: 15px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border: none; z-index: 1; text-decoration: none;
   }
-  .btn-donate:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,71,87,0.3); }
+  .btn-donate::after {
+    content: ''; position: absolute; inset: 0; border-radius: 12px; border: 2px solid #ff4757; z-index: -1;
+    animation: pulseDonate 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+  .btn-donate:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 20px rgba(255,71,87,0.4); background: #ff2a3f; }
+  .btn-donate:active { transform: translateY(0) scale(0.98); }
+  .coffee-icon { display: inline-block; transition: transform 0.3s ease; }
+  .btn-donate:hover .coffee-icon { transform: rotate(18deg) scale(1.2) translateY(-2px); }
+  @keyframes pulseDonate {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+
+  /* Share Buttons */
+  .share-section { margin-top: 60px; text-align: center; }
+  .share-section p { color: var(--text); font-weight: 600; margin-bottom: 15px; font-size: 1.05rem; }
+  .share-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-share { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; cursor: pointer; color: #fff; border: none; transition: transform 0.2s, opacity 0.2s; text-decoration: none; }
+  .btn-share:hover { transform: translateY(-3px); opacity: 0.9; }
+  .btn-share.wa { background: #25D366; }
+  .btn-share.tw { background: #000; border: 1px solid rgba(255,255,255,0.2); }
+  .btn-share.tg { background: #2CA5E0; }
+  .btn-share.fb { background: #1877F2; }
 </style>
 </head>
 <body>
@@ -150,8 +210,19 @@
   <div class="container">
     <header>
       <div class="badge">All-in-One Tools</div>
-      <h1>Pusat Unduhan<br><span>Kita.in</span></h1>
+      <div class="header-title-wrap">
+        <!-- Logo Kustom -->
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Kita.in" class="header-logo">
+        <h1>Pusat Unduhan<br><span>Kita.in</span></h1>
+      </div>
       <p class="subtitle">Pilih platform yang ingin kamu tuju. Download video dan audio berkualitas tinggi tanpa batas dari mana saja.</p>
+    
+    <!-- Fake Marketing Stats -->
+    <div class="hero-stats">
+      <div class="stat-badge"><span>10+</span> Platform</div>
+      <div class="stat-badge"><span>4K</span> Quality</div>
+      <div class="stat-badge"><span>100%</span> Gratis & Aman</div>
+    </div>
     </header>
 
     <!-- Tempat Iklan Atas -->
@@ -201,6 +272,46 @@
         <div class="card-arrow">Buka Tool <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
       </a>
 
+      <!-- X (Twitter) -->
+      <a href="/tw" class="card tw">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </div>
+        <h2 class="card-title">X (Twitter)</h2>
+        <p class="card-desc">Simpan video viral, klip lucu, dan GIF dari X dengan resolusi aslinya.</p>
+        <div class="card-arrow">Buka Tool <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </a>
+
+      <!-- Threads -->
+      <a href="/th" class="card th">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"></path></svg>
+        </div>
+        <h2 class="card-title">Threads</h2>
+        <p class="card-desc">Download video, audio, dan gambar menarik dari Threads dengan kualitas aslinya.</p>
+        <div class="card-arrow">Buka Tool <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </a>
+
+        <!-- Xiaohongshu -->
+        <a href="/xhs" class="card xhs">
+          <div class="icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4a2 2 0 0 0-2-2H6.5A2.5 2.5 0 0 0 4 4.5v15ZM6.5 15a1 1 0 0 0-1 1v4h14v-4H6.5Z"/></svg>
+          </div>
+          <h2 class="card-title">Xiaohongshu</h2>
+          <p class="card-desc">Download video dan kumpulan foto (carousel) dari Xiaohongshu (Rednote).</p>
+          <div class="card-arrow">Buka Tool <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+        </a>
+
+      <!-- Image Downloader -->
+      <a href="/img" class="card img">
+        <div class="icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+        </div>
+        <h2 class="card-title">Image Downloader</h2>
+        <p class="card-desc">Download gambar publik resolusi tinggi dari Pinterest, Freepik, Imgur, dan lainnya.</p>
+        <div class="card-arrow">Buka Tool <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </a>
+
       <!-- Universal MP3 -->
       <a href="/mp3" class="card mp3">
         <div class="icon-wrap">
@@ -231,6 +342,29 @@
       </div>
     </div>
 
+    <!-- Bagian Berbagi (Share) -->
+    <div class="share-section">
+      <p>Bagikan Pusat Unduhan Kita.in ke teman Anda:</p>
+      <div class="share-buttons">
+        <a href="#" onclick="shareWhatsApp(event)" class="btn-share wa">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 0C5.385 0 .003 5.385.003 12.031c0 2.122.552 4.195 1.602 6.01L0 24l6.103-1.604a11.968 11.968 0 0 0 5.928 1.564h.004c6.643 0 12.032-5.386 12.032-12.033A11.96 11.96 0 0 0 12.031 0zm0 20.088h-.003a9.92 9.92 0 0 1-5.06-1.378l-.364-.216-3.763.987 1.004-3.668-.236-.376A9.923 9.923 0 0 1 2.04 12.03c0-5.518 4.48-9.996 10-9.996 2.673 0 5.178 1.042 7.067 2.93A9.94 9.94 0 0 1 22.04 12.03c0 5.518-4.48 9.996-10 9.996zM17.518 14.332c-.3-.151-1.776-.875-2.05-.975-.273-.1-.473-.151-.673.151-.197.299-.767.975-.941 1.176-.174.198-.348.225-.648.074-.298-.151-1.267-.466-2.415-1.423-.89-.742-1.493-1.658-1.667-1.958-.174-.3-.02-.462.13-.612.135-.134.3-.349.45-.522.148-.174.198-.299.298-.499.1-.198.05-.373-.025-.523-.075-.151-.672-1.623-.921-2.222-.24-.585-.486-.505-.672-.513l-.574-.012c-.2 0-.523.074-.797.373-.274.3-1.046 1.022-1.046 2.493s1.07 2.894 1.22 3.094c.15.201 2.11 3.224 5.109 4.516.714.308 1.27.493 1.705.63.716.228 1.367.196 1.882.119.578-.086 1.776-.724 2.025-1.424.25-.699.25-1.298.175-1.423-.075-.124-.274-.2-.574-.349z"/></svg>
+          WhatsApp
+        </a>
+        <a href="#" onclick="shareTwitter(event)" class="btn-share tw">
+          <svg width="20" height="20" viewBox="0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          X (Twitter)
+        </a>
+        <a href="#" onclick="shareTelegram(event)" class="btn-share tg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a5.8 5.8 0 0 0-.164.003L12 0zm-1.895 16.59l.487-4.14 7.625-6.887c.334-.298-.073-.463-.52-.167L7.202 11.28l-4.008-1.25c-.87-.272-.888-.87.182-1.288l15.65-6.03c.725-.268 1.353.167 1.106 1.258l-2.66 12.523c-.2.902-.734 1.12-1.48.702l-4.095-3.023-1.977 1.9c-.218.22-.402.404-.824.404z"/></svg>
+          Telegram
+        </a>
+        <a href="#" onclick="shareFacebook(event)" class="btn-share fb">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </a>
+      </div>
+    </div>
+
     <!-- Tempat Iklan Bawah -->
     <div class="ad-banner">
       <!-- PASTE SCRIPT IKLAN NATIVE BANNER / 300x250 ADSTERRA DI SINI -->
@@ -243,9 +377,9 @@
     &copy; 2024 Kita.in - Semua Hak Cipta Dilindungi.<br>
     Layanan web unduhan video dan audio gratis untuk kebutuhan digital Anda.<br>
     <div style="margin-top: 10px;">
-      <a href="/tos">Terms of Service</a> | <a href="/privacy">Privacy Policy</a>
+      <a href="/tos">Terms of Service</a> | <a href="/privacy">Privacy Policy</a> | <a href="/contact">Contact Us</a>
     </div>
-    <a href="https://trakteer.id/iam_tomz" target="_blank" class="btn-donate">☕ Dukung Developer</a>
+    <a href="https://trakteer.id/iam_tomz/tip" target="_blank" class="btn-donate"><span class="coffee-icon">☕</span> Dukung Developer</a>
   </footer>
 
   <script>
@@ -278,6 +412,9 @@
       }
     });
   </script>
+
+  <!-- Load Script Share -->
+  <script src="{{ url_for('static', filename='js/share.js') }}"></script>
 
   <!-- Script Popunder / Social Bar Adsterra -->
   <script type="text/javascript" src="https://www.profitablecpmratenetwork.com/umtcqfn3?key=c669d884aa749733fddcde4849b3f4ac"></script>

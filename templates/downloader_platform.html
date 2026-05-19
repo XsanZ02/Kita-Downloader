@@ -12,8 +12,8 @@
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <!-- Favicon Otomatis (Format SVG) -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23c8f135'/%3E%3Ctext x='12' y='68' font-family='sans-serif' font-weight='900' font-size='42' fill='%230a0a0f' letter-spacing='-2'%3EKd%3C/text%3E%3Cpath d='M78 35 v30 M66 53 l12 12 l12 -12' stroke='%230a0a0f' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+  <!-- Favicon Kustom -->
+  <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
   <title>{{ platform }} Downloader - Kita.in</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -31,6 +31,7 @@
       --font-body: 'DM Sans', sans-serif;
       --overlay: rgba(255,255,255,0.05);
       --overlay-hover: rgba(255,255,255,0.1);
+    --accent-text: #c8f135;
     }
     :root.light-mode {
       --bg: #f4f4f8;
@@ -41,7 +42,12 @@
       --muted: #666677;
       --overlay: rgba(0,0,0,0.05);
       --overlay-hover: rgba(0,0,0,0.1);
+    --accent-text: #4a6b00;
     }
+    /* Platform Theming (Subtle Accent) */
+    h1 span { color: var(--pf-color, #c8f135) !important; }
+    .spinner-custom { border-top-color: var(--pf-color, #c8f135) !important; }
+
     body {
       background: var(--bg); color: var(--text); font-family: var(--font-body);
       min-height: 100vh; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center;
@@ -67,9 +73,38 @@
     #btnProcess { background: var(--accent); color: #000; border: none; padding: 0 24px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; }
     #btnProcess:hover:not(:disabled) { background: var(--accent-hover); transform: scale(1.02); }
     #btnProcess:disabled { opacity: 0.5; cursor: not-allowed; }
+    #btnProcess:active:not(:disabled) { transform: scale(0.95); }
+    
+    .example-hint { text-align: left; font-size: 0.85rem; color: var(--muted); margin-top: -10px; margin-bottom: 25px; margin-left: 5px; }
+    .example-hint span { color: var(--text); cursor: pointer; text-decoration: underline; text-decoration-style: dashed; transition: color 0.2s; }
+    .example-hint span:hover { color: var(--accent-text); }
 
-    /* Error Box */
-    #errorBox { background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.3); color: var(--error); padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left; }
+    /* Toast Notification (Popup Modern) */
+    .toast-container {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;
+      display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+    }
+    .toast {
+      background: var(--surface); color: var(--text); padding: 14px 24px; border-radius: 12px;
+      border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      font-weight: 600; display: flex; align-items: center; gap: 10px;
+      animation: slideDownToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+  .toast.success { border-left: 4px solid var(--accent-text); }
+  .toast.success svg { color: var(--accent-text); }
+    .toast.error { border-left: 4px solid var(--error); }
+    .toast.error svg { color: var(--error); }
+    .toast.hide { animation: fadeOutToast 0.4s ease forwards; }
+    @keyframes slideDownToast { 0% { opacity: 0; transform: translateY(-20px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes fadeOutToast { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-20px) scale(0.9); } }
+
+    /* Loading State Cinematic */
+    #loadingOverlay { display: none; flex-direction: column; align-items: center; gap: 15px; margin: 30px 0 40px; animation: slideDownToast 0.4s ease; }
+    .spinner-custom { width: 40px; height: 40px; border: 4px solid var(--overlay); border-top-color: var(--accent-text); border-radius: 50%; animation: spin 1s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite; }
+    #loadingTextRotator { font-weight: 700; font-size: 1.1rem; color: var(--text); background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .fake-progress-track { width: 100%; max-width: 250px; height: 6px; background: var(--overlay); border-radius: 10px; overflow: hidden; }
+    #fakeProgressBar { height: 100%; width: 0%; background: var(--gradient-text); transition: width 0.3s ease; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Result Wrap */
     #resultWrap, #playlistWrap { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: left; margin-bottom: 20px; }
@@ -79,25 +114,45 @@
     .video-info h3 { margin: 0 0 10px; font-size: 1.3rem; }
     #videoChannel { color: var(--muted); margin-bottom: 15px; font-size: 0.95rem; }
     .badges { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
-    .badges span { background: var(--overlay); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; color: var(--muted); }
+    .badges span { background: var(--overlay); border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; color: var(--text); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+    .badges .badge-highlight { color: var(--accent-text); border-color: rgba(200,241,53,0.3); background: rgba(200,241,53,0.05); }
     
     #qualityGrid { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .quality-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 16px; border-radius: 10px; cursor: pointer; }
-    .quality-btn.active { border-color: var(--accent); background: rgba(200,241,53,0.1); }
+    .quality-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 16px; border-radius: 12px; cursor: pointer; transition: 0.2s; text-align: left; }
+    .quality-btn:hover { border-color: var(--border-hover); background: var(--overlay); }
+    .quality-btn.active { border-color: var(--accent-text); background: rgba(200,241,53,0.1); box-shadow: inset 0 0 0 1px var(--accent-text); }
+    .hd-badge { background: var(--error); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-right: 6px; vertical-align: middle; box-shadow: 0 2px 5px rgba(255,71,87,0.3); }
     .q-label { font-weight: 600; } .q-sub { color: var(--muted); font-size: 0.8rem; display: block;}
     
-    .actions { display: flex; gap: 12px; }
-    .actions button { flex: 1; padding: 14px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .actions button { flex: 1; min-width: 140px; padding: 14px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 1rem; }
     #btnDlVideo { background: var(--text); color: var(--bg); }
     #btnDlVideo:hover:not(:disabled) { opacity: 0.8; transform: translateY(-2px); }
     #btnDlMp3 { background: var(--overlay-hover); color: var(--text); }
     #btnDlMp3:hover:not(:disabled) { background: var(--border-hover); transform: translateY(-2px); }
+    #btnDlThumb { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    #btnDlThumb:hover:not(:disabled) { background: var(--overlay); border-color: var(--accent); transform: translateY(-2px); }
     .actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* Mobile Sticky CTA */
+    @media(max-width: 600px) {
+      .actions { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); padding: 15px 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.3); z-index: 100; border-top: 1px solid var(--border); margin: 0; border-radius: 20px 20px 0 0; justify-content: center; gap: 10px; }
+      .actions button { padding: 12px; font-size: 0.95rem; flex: 1; min-width: 0; }
+      #resultWrap { padding-bottom: 70px; }
+    }
 
     /* Progress */
-    #progressWrap { background: var(--surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; text-align: left;}
-    .progress-track { width: 100%; background: var(--overlay); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
-    #progressBar { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
+    #progressWrap { background: var(--surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; text-align: left; }
+    .progress-track { width: 100%; background: var(--overlay); height: 24px; border-radius: 12px; overflow: hidden; margin-bottom: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
+    #progressBar { 
+      height: 100%; width: 0%; border-radius: 12px; transition: width 0.3s ease;
+      background: linear-gradient(90deg, #c8f135, #35f1c8, #c8f135);
+      background-size: 200% 100%;
+      animation: gradientMove 2s linear infinite;
+      display: flex; align-items: center; justify-content: flex-end;
+      padding-right: 12px; box-sizing: border-box;
+      color: #0a0a0f; font-weight: 800; font-size: 0.85rem; font-family: var(--font-body);
+    }
+    @keyframes gradientMove { 0% { background-position: 200% 0; } 100% { background-position: 0 0; } }
     #progressLabel { font-size: 0.9rem; color: var(--muted); margin: 0; }
 
     /* History */
@@ -109,9 +164,11 @@
     .history-item { display: flex; align-items: center; gap: 15px; padding: 10px; background: var(--bg); border-radius: 12px; cursor: pointer; transition: 0.2s; }
     .history-item:hover { border: 1px solid var(--border-hover); }
     .history-thumb { width: 60px; height: 40px; border-radius: 6px; object-fit: cover; }
-    .history-info { flex: 1; overflow: hidden; }
+    .history-info { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
     .history-text { display: block; font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .history-url { display: block; font-size: 0.8rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; }
+    .history-time { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
     .btn-remove-history { background: none; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; }
     .btn-remove-history:hover { color: var(--error); }
 
@@ -124,25 +181,64 @@
     .guide-section h2 { font-size: 1.5rem; margin-bottom: 20px; font-family: var(--font-display); color: var(--text); }
     .guide-list { list-style: none; padding: 0; counter-reset: step-counter; }
     .guide-list li { position: relative; padding-left: 50px; margin-bottom: 20px; color: var(--muted); line-height: 1.6; }
-    .guide-list li::before { content: counter(step-counter); counter-increment: step-counter; position: absolute; left: 0; top: -2px; background: var(--surface); color: var(--accent); font-weight: bold; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--accent); }
+  .guide-list li::before { content: counter(step-counter); counter-increment: step-counter; position: absolute; left: 0; top: -2px; background: var(--surface); color: var(--accent-text); font-weight: bold; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--accent-text); }
     footer { margin-top: 60px; text-align: center; padding: 30px 20px; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--border); width: 100%; line-height: 1.8; }
     footer a { color: var(--text); text-decoration: none; margin: 0 10px; font-weight: 500; transition: color 0.2s; }
-    footer a:hover { color: var(--accent); }
+  footer a:hover { color: var(--accent-text); }
 
     /* Ads & Donation */
     .ad-banner {
       width: 100%; max-width: 728px; min-height: 90px; margin: 20px auto 30px auto;
       background: var(--overlay); border: 1px dashed var(--border); border-radius: 12px;
       display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.9rem;
+      position: relative; overflow: hidden;
     }
+    .ad-banner::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 2s infinite; }
+    .light-mode .ad-banner::before { background: linear-gradient(90deg, transparent, rgba(0,0,0,0.03), transparent); }
+    @keyframes shimmer { 100% { left: 100%; } }
+
     .btn-donate {
-      display: inline-flex; align-items: center; gap: 8px; background: #ff4757; color: #fff !important;
-      padding: 8px 16px; border-radius: 8px; font-weight: 600; margin-top: 15px; transition: 0.2s; border: none;
+      position: relative; display: inline-flex; align-items: center; gap: 8px; background: #ff4757; color: #fff !important;
+      padding: 10px 20px; border-radius: 12px; font-weight: 700; margin-top: 15px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border: none; z-index: 1; text-decoration: none;
     }
-    .btn-donate:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,71,87,0.3); }
+    .btn-donate::after {
+      content: ''; position: absolute; inset: 0; border-radius: 12px; border: 2px solid #ff4757; z-index: -1;
+      animation: pulseDonate 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    .btn-donate:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 20px rgba(255,71,87,0.4); background: #ff2a3f; }
+    .btn-donate:active { transform: translateY(0) scale(0.98); }
+    .coffee-icon { display: inline-block; transition: transform 0.3s ease; }
+    .btn-donate:hover .coffee-icon { transform: rotate(18deg) scale(1.2) translateY(-2px); }
+    @keyframes pulseDonate {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(1.3); opacity: 0; }
+    }
+
+    /* Share Buttons */
+    .share-section { margin-top: 40px; text-align: center; }
+    .share-section p { color: var(--text); font-weight: 600; margin-bottom: 15px; font-size: 1.05rem; }
+    .share-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-share { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; cursor: pointer; color: #fff; border: none; transition: transform 0.2s, opacity 0.2s; text-decoration: none; }
+    .btn-share:hover { transform: translateY(-3px); opacity: 0.9; }
+    .btn-share.wa { background: #25D366; }
+    .btn-share.tw { background: #000; border: 1px solid rgba(255,255,255,0.2); }
+    .btn-share.tg { background: #2CA5E0; }
+    .btn-share.fb { background: #1877F2; }
   </style>
+  
+  {% set pf_color = '#c8f135' %}
+  {% if platform == 'YouTube' %}{% set pf_color = '#ff4757' %}
+  {% elif platform == 'TikTok' %}{% set pf_color = '#00f2fe' %}
+  {% elif platform == 'Instagram' %}{% set pf_color = '#e84393' %}
+  {% elif platform == 'Facebook' %}{% set pf_color = '#1877f2' %}
+  {% elif platform == 'Xiaohongshu' %}{% set pf_color = '#ff2442' %}
+  {% elif platform == 'Image Downloader' %}{% set pf_color = '#ff9800' %}
+  {% endif %}
 </head>
-<body>
+<body style="--pf-color: {{ pf_color }};">
+
+  <!-- Container untuk Toast Notifications -->
+  <div id="toastContainer" class="toast-container"></div>
 
   <div class="navbar">
     <a href="/">&larr; Kembali ke Beranda</a>
@@ -164,20 +260,29 @@
       <button class="btn-paste" onclick="pasteURL()">Tempel</button>
       <button id="btnProcess" onclick="processURL()">Proses &rarr;</button>
     </div>
+    
+    <div class="example-hint" id="exampleHint">
+      Contoh: <span onclick="fillExample()">https://www.{{ platform|lower|replace('x (twitter)', 'twitter')|replace('soundrip mp3', 'youtube')|replace('image downloader', 'pinterest') }}.com/watch?v=...</span>
+    </div>
 
-    <div id="errorBox" style="display: none;">
-      <span id="errorText"></span>
+    <!-- Loading Cinematic -->
+    <div id="loadingOverlay">
+      <div class="spinner-custom"></div>
+      <div id="loadingTextRotator">Menghubungkan ke {{ platform }}...</div>
+      <div class="fake-progress-track"><div id="fakeProgressBar"></div></div>
     </div>
 
     <!-- Result Wrap -->
     <div id="resultWrap" style="display: none;">
       <div class="video-header">
-        <img id="thumbnail" src="" alt="Thumbnail">
+        <img id="thumbnail" src="" alt="Thumbnail" referrerpolicy="no-referrer">
         <div class="video-info">
           <h3 id="videoTitle"></h3>
           <div id="videoChannel"></div>
           <div class="badges">
             <span id="durationBadge"></span>
+            <span class="badge-highlight"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> Aman</span>
+            <span>⚡ Cepat</span>
             <span id="statViews"></span>
             <span id="statDate"></span>
           </div>
@@ -189,6 +294,7 @@
       <div class="actions">
         <button id="btnDlVideo" onclick="downloadFile('mp4')">Unduh Video</button>
         <button id="btnDlMp3" onclick="downloadFile('mp3')">Unduh MP3</button>
+        <button id="btnDlThumb" onclick="downloadThumbnail()">Unduh Thumbnail</button>
       </div>
     </div>
 
@@ -216,6 +322,29 @@
       <div id="historyList"></div>
     </div>
 
+    <!-- Bagian Berbagi (Share) -->
+    <div class="share-section">
+      <p>Bagikan alat ini ke teman Anda:</p>
+      <div class="share-buttons">
+        <a href="#" onclick="shareWhatsApp(event)" class="btn-share wa">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 0C5.385 0 .003 5.385.003 12.031c0 2.122.552 4.195 1.602 6.01L0 24l6.103-1.604a11.968 11.968 0 0 0 5.928 1.564h.004c6.643 0 12.032-5.386 12.032-12.033A11.96 11.96 0 0 0 12.031 0zm0 20.088h-.003a9.92 9.92 0 0 1-5.06-1.378l-.364-.216-3.763.987 1.004-3.668-.236-.376A9.923 9.923 0 0 1 2.04 12.03c0-5.518 4.48-9.996 10-9.996 2.673 0 5.178 1.042 7.067 2.93A9.94 9.94 0 0 1 22.04 12.03c0 5.518-4.48 9.996-10 9.996zM17.518 14.332c-.3-.151-1.776-.875-2.05-.975-.273-.1-.473-.151-.673.151-.197.299-.767.975-.941 1.176-.174.198-.348.225-.648.074-.298-.151-1.267-.466-2.415-1.423-.89-.742-1.493-1.658-1.667-1.958-.174-.3-.02-.462.13-.612.135-.134.3-.349.45-.522.148-.174.198-.299.298-.499.1-.198.05-.373-.025-.523-.075-.151-.672-1.623-.921-2.222-.24-.585-.486-.505-.672-.513l-.574-.012c-.2 0-.523.074-.797.373-.274.3-1.046 1.022-1.046 2.493s1.07 2.894 1.22 3.094c.15.201 2.11 3.224 5.109 4.516.714.308 1.27.493 1.705.63.716.228 1.367.196 1.882.119.578-.086 1.776-.724 2.025-1.424.25-.699.25-1.298.175-1.423-.075-.124-.274-.2-.574-.349z"/></svg>
+          WhatsApp
+        </a>
+        <a href="#" onclick="shareTwitter(event)" class="btn-share tw">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          X (Twitter)
+        </a>
+        <a href="#" onclick="shareTelegram(event)" class="btn-share tg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a5.8 5.8 0 0 0-.164.003L12 0zm-1.895 16.59l.487-4.14 7.625-6.887c.334-.298-.073-.463-.52-.167L7.202 11.28l-4.008-1.25c-.87-.272-.888-.87.182-1.288l15.65-6.03c.725-.268 1.353.167 1.106 1.258l-2.66 12.523c-.2.902-.734 1.12-1.48.702l-4.095-3.023-1.977 1.9c-.218.22-.402.404-.824.404z"/></svg>
+          Telegram
+        </a>
+        <a href="#" onclick="shareFacebook(event)" class="btn-share fb">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </a>
+      </div>
+    </div>
+
     <!-- Panduan Penggunaan Dinamis -->
     <div class="guide-section">
       <h2>Cara Mengunduh dari {{ platform }}</h2>
@@ -228,6 +357,13 @@
       <p style="margin-top: 30px; color: #777; font-size: 0.9rem; line-height: 1.6;">
         <strong>Tentang Alat Ini:</strong> {{ platform }} Downloader dari Kita.in adalah layanan unduhan daring serba guna yang memudahkan Anda menyimpan media publik dari {{ platform }}. Tidak ada batasan jumlah file dan Anda tidak diharuskan menginstal aplikasi tambahan di HP maupun komputer Anda.
       </p>
+      
+      <!-- Trust Boost: FAQ -->
+      <hr style="border: none; border-top: 1px solid var(--border); margin: 30px 0;">
+      <h2>Pertanyaan Umum (FAQ)</h2>
+      <div style="margin-bottom: 15px;"><strong>Q: Apakah layanan ini 100% aman?</strong><br><span style="color: var(--muted); font-size: 0.95rem;">A: Ya. Kami tidak meminta login, tidak menyimpan file media Anda di server kami, dan file diunduh langsung ke perangkat Anda.</span></div>
+      <div style="margin-bottom: 15px;"><strong>Q: Apakah file video memiliki Watermark?</strong><br><span style="color: var(--muted); font-size: 0.95rem;">A: Untuk platform pendukung seperti TikTok dan Xiaohongshu, sistem kami secara otomatis menghapus watermark aslinya.</span></div>
+      <div style="margin-bottom: 15px;"><strong>Q: Mengapa unduhan kadang gagal?</strong><br><span style="color: var(--muted); font-size: 0.95rem;">A: Pastikan tautan video bersifat publik (tidak digembok privasinya). Konten privat dan premium diblokir otomatis oleh keamanan sistem kami.</span></div>
     </div>
 
     <!-- Tempat Iklan Bawah -->
@@ -240,13 +376,16 @@
   <footer>
     &copy; 2024 Kita.in - {{ platform }} Downloader.<br>
     <div style="margin-top: 10px;">
-      <a href="/tos">Terms of Service</a> | <a href="/privacy">Privacy Policy</a>
+      <a href="/tos">Terms of Service</a> | <a href="/privacy">Privacy Policy</a> | <a href="/contact">Contact Us</a>
     </div>
-    <a href="https://trakteer.id/iam_tomz" target="_blank" class="btn-donate">☕ Dukung Developer</a>
+    <a href="https://trakteer.id/iam_tomz/tip" target="_blank" class="btn-donate"><span class="coffee-icon">☕</span> Dukung Developer</a>
   </footer>
 
   <!-- Load Script Utama -->
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+  <!-- Load Script Share -->
+  <script src="{{ url_for('static', filename='js/share.js') }}"></script>
 
   <!-- Script Popunder / Social Bar Adsterra -->
   <script type="text/javascript" src="https://www.profitablecpmratenetwork.com/umtcqfn3?key=c669d884aa749733fddcde4849b3f4ac"></script>

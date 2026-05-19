@@ -19,11 +19,13 @@
       --accent: #c8f135;
       --font-display: 'Syne', sans-serif;
       --font-body: 'DM Sans', sans-serif;
+      --accent-text: #c8f135;
     }
     :root.light-mode {
       --bg: #f4f4f8;
       --text: #12121a;
       --muted: #666677;
+      --accent-text: #4a6b00;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -50,7 +52,7 @@
       font-size: clamp(6rem, 15vw, 10rem);
       font-weight: 800;
       line-height: 1;
-      color: var(--accent);
+      color: var(--accent-text);
       margin-bottom: 10px;
       text-shadow: 0 0 40px rgba(200, 241, 53, 0.2);
     }

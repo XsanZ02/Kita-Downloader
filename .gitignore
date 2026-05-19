@@ -1,14 +1,7 @@
-# Python environment & cache
+# Node.js
+node_modules/
+
+# Python & Flask
 __pycache__/
-*.py[cod]
-venv/
-env/
+*.pyc
 .env
-
-# Folder penyimpanan sementara (Downloads)
-youtube_downloads/
-platform_downloads/
-
-# File sistem bawaan OS
-.DS_Store
-Thumbs.db
