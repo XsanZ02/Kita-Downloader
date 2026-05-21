@@ -54,6 +54,15 @@ window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e 
   }
 });
 
+// ── Sticky Navbar Scroll Listener ────────────────────────────
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('topNav');
+  if (nav) {
+    if (window.scrollY > 20) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  }
+});
+
 // ── Paste URL ──────────────────────────────────────────────
 async function pasteURL() {
   try {

@@ -44,7 +44,7 @@ def img():
 
 @main_bp.route('/mp3')
 def mp3():
-    return render_template('downloader_platform.html', platform='SoundRip MP3', desc='Konversi audio dari ratusan platform menjadi format MP3 tinggi (320kbps).')
+    return render_template('downloader_platform.html', platform='SoundRip MP3', desc='Konversi lagu dari Spotify, Apple Music, SoundCloud, YouTube Music dan 1000+ platform lainnya menjadi format MP3 kualitas tinggi (320kbps).')
 
 @main_bp.route('/tos')
 def tos():
